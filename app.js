@@ -1,8 +1,8 @@
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
-// const contactsRouter = require('./routes/api/contacts');
-// const usersRouter = require("./routes/api/users");
+// const contactsRouter = require('.src/routes/api/contacts');
+const usersRouter = require("./src/routes/api/users");
 
 const app = express();
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json()); // нужно для отправки тела запроса в формате json
 // app.use(express.static("public")); // разрешает Express раздачу статичных файлов из папки public
 
-// app.use("/api/users", usersRouter);
+app.use("/api/users", usersRouter);
 // app.use("/api/contacts", contactsRouter);
 
 app.use((req, res) => {
