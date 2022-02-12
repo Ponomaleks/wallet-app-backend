@@ -9,6 +9,7 @@ mongoose
   .then(() => {
     app.listen(PORT, () => {
       console.log("Ok, we connect to DB");
+      console.log("We run in PORT 8080");
     });
   })
   .catch((error) => {
