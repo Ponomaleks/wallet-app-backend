@@ -8,8 +8,8 @@ mongoose
   .connect(DB_HOST)
   .then(() => {
     app.listen(PORT, () => {
-      console.log("Ok, we connect to DB");
-      console.log("We run in PORT 8080");
+      console.log("Ok, we connect to DB. We run in PORT 8080");
+      console.log("http://localhost:8080/api-docs/ - документация сервера");
     });
   })
   .catch((error) => {
