@@ -25,7 +25,7 @@ const transactionSchema = Schema({
       "basic expenses",
       "food",
       "car",
-      "me",
+      "personal",
       "children",
       "home",
       "education",
