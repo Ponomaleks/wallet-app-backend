@@ -2,48 +2,54 @@ const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
 const transactionSchema = Schema({
-  // Блок дат
   date: {
-    type: Date,
-    min: "2020-01-01",
+    type: String,
+    require: true,
   },
   year: {
-    type: Date, //???
+    type: Number,
   },
   month: {
-    type: Date, //???
+    type: Number,
   },
-  // Тип транзакции доход=true, расход=false
   typeTransaction: {
-    type: Boolean,
-    default: false,
+    type: String,
+    enum: ["+", "-"],
+    require: true,
   },
-  // Категории расходов
   category: {
     type: String,
     enum: [
-      "basic expenses",
-      "food",
-      "car",
-      "personal",
-      "children",
-      "home",
-      "education",
-      "leisure",
-      "other expenses",
+      "Regular income",
+      "Irregular income",
+      "Basic",
+      "Food",
+      "Car",
+      "Development",
+      "Children",
+      "House",
+      "Education",
+      "Other",
+      // "basic expenses",
+      // "food",
+      // "car",
+      // "personal",
+      // "children",
+      // "home",
+      // "education",
+      // "leisure",
+      // "other expenses",
     ],
-    default: "basic expenses",
+    default: "Basic",
   },
-  // Комментарий к доходу
   сommentary: {
     type: String,
-    // required: [true],
   },
-  // Сумма транзакции
   amountTransaction: {
     type: Number,
+    require: true,
+    set: (data) => Number(data),
   },
-  // Баланс счета
   balance: {
     type: Number,
   },
@@ -53,44 +59,24 @@ const transactionSchema = Schema({
   },
 });
 
-// Joi схема для записи дохода
-const earningsSchema = Joi.object({
+const incomeSchema = Joi.object({
   date: Joi.date().required(),
-  year: Joi.date().required(),
-  month: Joi.date().required(),
-  typeTransaction: Joi.boolean().required(),
+  typeTransaction: Joi.string().valid("+", "-").required(),
   сommentary: Joi.string(),
   amountTransaction: Joi.number().required(),
-  balance: Joi.number().required(),
 });
 
-// Joi схема для записи расходов
 const expenseSchema = Joi.object({
   date: Joi.date().required(),
-  year: Joi.date().required(),
-  month: Joi.date().required(),
-  typeTransaction: Joi.boolean().required(),
-  category: Joi.string().required(),
+  typeTransaction: Joi.string().valid("+", "-").required(),
+  сommentary: Joi.string(),
   amountTransaction: Joi.number().required(),
-  balance: Joi.number().required(),
-});
-
-// Joi схема статистики для дашборда(таблица, график)
-const statisticSchema = Joi.object({
-  date: Joi.date().required(),
-  year: Joi.date().required(),
-  month: Joi.date().required(),
-  typeTransaction: Joi.boolean().required(),
-  category: Joi.string().required(),
-  amountTransaction: Joi.number().required(),
-  balance: Joi.number().required(),
 });
 
 const Transaction = model("transaction", transactionSchema);
 
 module.exports = {
   Transaction,
-  earningsSchema,
+  incomeSchema,
   expenseSchema,
-  statisticSchema,
 };
