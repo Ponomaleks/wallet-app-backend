@@ -37,10 +37,10 @@ const userSchema = Schema(
   { versionKey: false, timestamps: true }
 );
 
-const joiSignupSchema = Joi.object({
+const RegisterSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
   password: Joi.string().min(6).max(12).required(),
-  name: Joi.string().min(1).max(12),
+  name: Joi.string().min(1).max(12).required(),
   token: Joi.string(),
 });
 
@@ -53,6 +53,6 @@ const User = model("user", userSchema);
 
 module.exports = {
   User,
-  joiSignupSchema,
+  RegisterSchema,
   joiLoginSchema,
 };
