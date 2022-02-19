@@ -112,7 +112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurrentResponse"
+                  "$ref": "#/components/schemas/LoginResponse"
                 }
               }
             }
@@ -285,41 +285,6 @@
         "example": {
           "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8",
           "user": { "email": "d.snata@gmail.com", "name": "Daniela" }
-        }
-      },
-      "CurrentResponse": {
-        "type": "object",
-        "properties": {
-          "user": {
-            "type": "object",
-            "properties": {
-              "_id": {
-                "type": "string",
-                "example": "620a0d2173f1614e3154d340"
-              },
-              "email": {
-                "type": "string",
-                "example": "Bismark@gmail.com"
-              },
-              "name": {
-                "type": "string",
-                "example": "Otto"
-              },
-              "token": {
-                "type": "string",
-                "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
-              }
-            }
-          }
-        },
-        "example": {
-          "user": {
-            "_id": "620a0d2173f1614e3154d340",
-            "email": "d.snata@gmail.com",
-            "password": "$2a$10$JTzSam7AJXx0Neta8lL1NOW4sNjzQ9JWCc2fUss9QmRYvWcmWZxeK",
-            "name": "Daniela",
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
-          }
         }
       },
       "TransactionsGetResponse": {
