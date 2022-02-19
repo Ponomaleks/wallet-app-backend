@@ -40,7 +40,7 @@ const transactionSchema = Schema({
       // "leisure",
       // "other expenses",
     ],
-    default: "Basic",
+    default: "Regular income",
   },
   сommentary: {
     type: String,
