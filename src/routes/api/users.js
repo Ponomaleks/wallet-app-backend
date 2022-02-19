@@ -35,7 +35,7 @@ router.post("/register", async (req, res, next) => {
       message: "Registration successful",
       user: {
         email: newUser.email,
-        name: newUser.name,
+        password: password,
       },
     });
   } catch (error) {
@@ -65,7 +65,7 @@ router.post("/login", async (req, res, next) => {
       id: _id,
     };
 
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "30min" });
+    const token = jwt.sign(payload, SECRET_KEY);
     await User.findByIdAndUpdate(_id, { token });
     res.json({
       token,
@@ -81,10 +81,14 @@ router.post("/login", async (req, res, next) => {
 
 // текущий пользователь
 router.get("/current", authenticate, async (req, res, next) => {
-  const { _id, email, password, name, token } = req.user;
+  const { email, name, token } = req.user;
   res.json({
-    user: { _id, email, password, name, token },
-  });
+      token,
+      user: {
+        email,
+        name,
+      },
+    });
 });
 
 // разлогинивание пользователя

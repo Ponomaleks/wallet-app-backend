@@ -9,9 +9,10 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
-  "servers": [{ "url": "http://localhost:8080" }, { "url": "http://localhost:8080" }],
+  "servers": [
+    { "url": "http://localhost:8080" },
+    { "url": "http://localhost:8080" }
+  ],
   "tags": [
     {
       "name": "Auth",
@@ -61,8 +62,8 @@
         }
       }
     },
-    "/api/auth/login":{
-        "post": {
+    "/api/auth/login": {
+      "post": {
         "tags": ["Auth"],
         "summary": "User login",
         "parameters": [],
@@ -99,8 +100,8 @@
         }
       }
     },
-    "/api/auth/current":{
-        "get": {
+    "/api/auth/current": {
+      "get": {
         "tags": ["Auth"],
         "summary": "User current",
         "parameters": [],
@@ -111,7 +112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurrentResponse"
+                  "$ref": "#/components/schemas/LoginResponse"
                 }
               }
             }
@@ -123,8 +124,8 @@
         }
       }
     },
-    "/api/auth/logout":{
-        "get": {
+    "/api/auth/logout": {
+      "get": {
         "tags": ["Auth"],
         "summary": "User logout",
         "parameters": [],
@@ -135,6 +136,54 @@
           },
           "401": {
             "description": "Invalid token",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/transaction": {
+      "get": {
+        "tags": ["Transaction"],
+        "summary": "User transactions",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsGetResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/transaction/:transactionID": {
+      "delete": {
+        "tags": ["Transaction"],
+        "summary": "User delete transaction",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionDeleteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
             "content": {}
           }
         }
@@ -169,26 +218,30 @@
         }
       },
       "RegistrationResponse": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string",
-              "description": "Registration successful"
-            },
-            "user":{
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Registration successful"
+          },
+          "user": {
             "type": "object",
             "properties": {
-            "email":{
+              "email": {
                 "type": "string",
                 "example": "Bismark@gmail.com"
-            },
-            "name": {
+              },
+              "name": {
                 "type": "string",
                 "example": "Otto"
-            }}}
-          },
-        "example": {"message": "Registration successful",
-          "user":{ "email": "d.snata@gmail.com", "name": "Daniela" }}
+              }
+            }
+          }
+        },
+        "example": {
+          "message": "Registration successful",
+          "user": { "email": "d.snata@gmail.com", "name": "Daniela" }
+        }
       },
       "LoginRequest": {
         "type": "object",
@@ -209,59 +262,117 @@
         }
       },
       "LoginResponse": {
-          "type": "object",
-          "properties": {
-            "token": {
-              "type": "string",
-              "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
-            },
-            "user":{
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
+          },
+          "user": {
             "type": "object",
             "properties": {
-            "email":{
+              "email": {
                 "type": "string",
                 "example": "Bismark@gmail.com"
-            },
-            "name": {
+              },
+              "name": {
                 "type": "string",
                 "example": "Otto"
-            }}}
-          },
-        "example": { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8",
-         "user": { "email": "d.snata@gmail.com", "name": "Daniela" }
+              }
+            }
+          }
+        },
+        "example": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8",
+          "user": { "email": "d.snata@gmail.com", "name": "Daniela" }
         }
       },
-      "CurrentResponse": {
-          "type": "object",
-          "properties": {
-            "user":{
+      "TransactionsGetResponse": {
+        "type": "object",
+        "properties": {
+          "transactions": {
             "type": "object",
             "properties": {
-            "_id":{
+              "_id": {
                 "type": "string",
-                "example": "620a0d2173f1614e3154d340"
-            },
-            "email":{
+                "example": "1234567"
+              },
+              "typeTransaction": {
                 "type": "string",
-                "example": "Bismark@gmail.com"
-            },
-            "name": {
+                "example": "+"
+              },
+              "category": {
                 "type": "string",
-                "example": "Otto"
-            },
-            "token": {
-              "type": "string",
-              "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
+                "example": "Income"
+              },
+              "сommentary": {
+                "type": "string",
+                "description": "Regular income"
+              },
+              "amountTransaction": {
+                "type": "number",
+                "example": "1.00"
+              },
+              "balance": {
+                "type": "number",
+                "example": "1.00"
+              }
             }
-            }}
-          },
-        "example": { 
-         "user": { 
-             "_id":"620a0d2173f1614e3154d340",
-             "email": "d.snata@gmail.com",
-             "password": "$2a$10$JTzSam7AJXx0Neta8lL1NOW4sNjzQ9JWCc2fUss9QmRYvWcmWZxeK",
-             "name": "Daniela",
-             "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8" }
+          }
+        },
+        "example": {
+          "transactions": {
+            "_id": "1234567",
+            "typeTransaction": "+",
+            "category": "Income",
+            "сommentary": "Regular income",
+            "amountTransaction": "1.00",
+            "balance": "1.00"
+          }
+        }
+      },
+      "TransactionDeleteResponse": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "1234567"
+              },
+              "typeTransaction": {
+                "type": "string",
+                "example": "+"
+              },
+              "category": {
+                "type": "string",
+                "example": "Income"
+              },
+              "сommentary": {
+                "type": "string",
+                "description": "Regular income"
+              },
+              "amountTransaction": {
+                "type": "number",
+                "example": "1.00"
+              },
+              "balance": {
+                "type": "number",
+                "example": "1.00"
+              }
+            }
+          }
+        },
+        "example": {
+          "transactions": {
+            "_id": "1234567",
+            "typeTransaction": "+",
+            "category": "Income",
+            "сommentary": "Regular income",
+            "amountTransaction": "1.00",
+            "balance": "1.00"
+          }
         }
       }
     },
