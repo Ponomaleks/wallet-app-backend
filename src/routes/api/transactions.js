@@ -4,12 +4,7 @@ const { NotFound, BadRequest } = require("http-errors");
 const authenticate = require("../../middlewares/authenticate");
 
 const countBalance = require("../../helpers/countBalance");
-const {
-  Transaction,
-  incomeSchema,
-  expenseSchema,
-  User,
-} = require("../../models");
+const { Transaction, joiSchemaTransaction, User } = require("../../models");
 
 // router.post("/", authenticate, async (req, res, next) => {
 //   console.log(authenticate);
@@ -58,6 +53,11 @@ router.get("/", authenticate, async (req, res, next) => {
 
 router.delete("/:transactionId", authenticate, async (req, res, next) => {
   try {
+    const { error } = joiSchemaTransaction.validate(req.body);
+    if (error) {
+      throw new BadRequest(error.message);
+    }
+
     const { transactionId, _id } = req.params;
     const { balance } = req.user;
     const { typeTransaction } = req.body;
@@ -72,8 +72,14 @@ router.delete("/:transactionId", authenticate, async (req, res, next) => {
     }
 
     const transactionBalance = countBalance(typeTransaction, balance, payload);
-    await User.findByIdAndUpdate(_id, transactionBalance, { new: true });
-
+    const updateBalance = await User.findByIdAndUpdate(
+      _id,
+      transactionBalance,
+      { new: true }
+    );
+    if (!updateBalance) {
+      throw new NotFound();
+    }
     res.json({ message: "transaction deleted" });
   } catch (error) {
     next(error);

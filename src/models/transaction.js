@@ -59,16 +59,21 @@ const transactionSchema = Schema({
   },
 });
 
-const incomeSchema = Joi.object({
+const joiSchemaTransaction = Joi.object({
   date: Joi.date().required(),
   typeTransaction: Joi.string().valid("+", "-").required(),
-  сommentary: Joi.string(),
-  amountTransaction: Joi.number().required(),
-});
-
-const expenseSchema = Joi.object({
-  date: Joi.date().required(),
-  typeTransaction: Joi.string().valid("+", "-").required(),
+  сategory: Joi.string().valid(
+    "Regular income",
+    "Irregular income",
+    "Basic",
+    "Food",
+    "Car",
+    "Development",
+    "Children",
+    "House",
+    "Education",
+    "Other"
+  ),
   сommentary: Joi.string(),
   amountTransaction: Joi.number().required(),
 });
@@ -77,6 +82,5 @@ const Transaction = model("transaction", transactionSchema);
 
 module.exports = {
   Transaction,
-  incomeSchema,
-  expenseSchema,
+  joiSchemaTransaction,
 };
