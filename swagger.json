@@ -165,6 +165,119 @@
         }
       }
     },
+    "/api/transaction/add": {
+      "post": {
+        "tags": ["Transaction"],
+        "summary": "Add transactions",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["date", "month", "year", "category", "amountTransaction", "typeTransaction" , "commentary"],
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "example": "16338784",
+                    "description": "date"
+                  },
+                  "month": {
+                    "type": "number",
+                    "example": 12,
+                    "description": "month"
+                  },
+                  "year": {
+                    "type": "number",
+                    "example": 2020,
+                    "description": "year"
+                  },
+                  "category": {
+                    "type": "string",
+                    "example": "Regular income",
+                    "description": "category"
+                  },
+                  "commentary": {
+                    "type": "string",
+                    "example": "Sallary per month",
+                    "description": "commentary"
+                  },
+                  "amountTransaction": {
+                    "type": "number",
+                    "example": 1000,
+                    "description": "amountTransaction"
+                  },
+                  "typeTransaction": {
+                    "type": "string",
+                    "example": "+",
+                    "description": "typeTransaction"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "responses status",
+                      "example": "success"
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "responses code",
+                      "example": "200"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "responses data",
+                      "example": {
+                        "newOperation": {
+                          "date": "16338784",
+                          "month": 12,
+                          "year": 2020,
+                          "typeTransaction": "+",
+                          "category": "Regular income",
+                          "commentary": "Sallary per month",
+                          "amountTransaction": 1000
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error 403"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Iternal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error 500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/transaction/:transactionID": {
       "delete": {
         "tags": ["Transaction"],
@@ -224,6 +337,13 @@
             "type": "string",
             "description": "Registration successful"
           },
+          "data":{
+             "type": "object",
+            "properties":{
+              "token": {
+            "type": "string",
+            "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
+          },
           "user": {
             "type": "object",
             "properties": {
@@ -237,10 +357,12 @@
               }
             }
           }
+            }
+          }
         },
         "example": {
-          "message": "Registration successful",
-          "user": { "email": "d.snata@gmail.com", "name": "Daniela" }
+          "message": "Registration successful","data":{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8","user": { "email": "d.snata@gmail.com", "name": "Daniela"}
+           }
         }
       },
       "LoginRequest": {
