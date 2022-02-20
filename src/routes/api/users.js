@@ -31,11 +31,21 @@ router.post("/register", async (req, res, next) => {
       name,
     });
 
+    const { _id } = newUser;
+    const payload = {
+      id: _id,
+    };
+
+    const token = jwt.sign(payload, SECRET_KEY);
+    await User.findByIdAndUpdate(_id, { token });
     res.status(201).json({
-      message: "Registration successful",
-      user: {
-        email: newUser.email,
-        password: password,
+      message: "User registered",
+      data: {
+        token,
+        user: {
+          email,
+          name,
+        },
       },
     });
   } catch (error) {
@@ -83,12 +93,12 @@ router.post("/login", async (req, res, next) => {
 router.get("/current", authenticate, async (req, res, next) => {
   const { email, name, token } = req.user;
   res.json({
-      token,
-      user: {
-        email,
-        name,
-      },
-    });
+    token,
+    user: {
+      email,
+      name,
+    },
+  });
 });
 
 // разлогинивание пользователя

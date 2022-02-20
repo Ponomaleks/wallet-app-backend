@@ -224,6 +224,13 @@
             "type": "string",
             "description": "Registration successful"
           },
+          "data":{
+             "type": "object",
+            "properties":{
+              "token": {
+            "type": "string",
+            "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
+          },
           "user": {
             "type": "object",
             "properties": {
@@ -237,10 +244,12 @@
               }
             }
           }
+            }
+          }
         },
         "example": {
-          "message": "Registration successful",
-          "user": { "email": "d.snata@gmail.com", "name": "Daniela" }
+          "message": "Registration successful","data":{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8","user": { "email": "d.snata@gmail.com", "name": "Daniela"}
+           }
         }
       },
       "LoginRequest": {
