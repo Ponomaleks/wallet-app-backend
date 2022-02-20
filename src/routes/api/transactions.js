@@ -6,32 +6,28 @@ const authenticate = require("../../middlewares/authenticate");
 const countBalance = require("../../helpers/countBalance");
 const { Transaction, joiSchemaTransaction, User } = require("../../models");
 
-// router.post("/", authenticate, async (req, res, next) => {
-//   console.log(authenticate);
-//   try {
-//     const { error } =
-//       incomeSchema.validate(req.body) && expenseSchema.validate(req.body);
-//     if (error) {
-//       throw new BadRequest(error.message);
-//     }
-//     const { _id, balance } = req.user;
-//     console.log(req.user);
-//     const { typeTransaction } = req.body;
-//     const transactionBalance = countBalance(typeTransaction, balance, payload);
-//     await User.findByIdAndUpdate(_id, transactionBalance, { new: true });
-//     const newTransaction = await Transaction.create({
-//       ...req.body,
-//       owner: _id,
-//       balance: transactionBalance,
-//     });
-//     res.status(201).json(newTransaction);
-//   } catch (error) {
-//     if (error.message.includes("validation failed")) {
-//       error.status = 400;
-//     }
-//     next(error);
-//   }
-// });
+router.post("/add", authenticate, async (req, res, next) => {
+  console.log(authenticate);
+  try {
+    const { error } =
+      joiSchemaTransaction.validate(req.body);
+    if (error) {
+      throw new BadRequest(error.message);
+    }
+    const { _id } = req.user;
+    console.log(req.user);
+    const newTransaction = await Transaction.create({
+      ...req.body,
+      owner: _id,
+    });
+    res.status(201).json(newTransaction);
+  } catch (error) {
+    if (error.message.includes("validation failed")) {
+      error.status = 400;
+    }
+    next(error);
+  }
+});
 
 router.get("/", authenticate, async (req, res, next) => {
   console.log(authenticate);
