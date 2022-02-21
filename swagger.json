@@ -175,7 +175,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["date", "month", "year", "category", "amountTransaction", "typeTransaction" , "commentary"],
+                "required": [
+                  "date",
+                  "month",
+                  "year",
+                  "category",
+                  "amountTransaction",
+                  "typeTransaction",
+                  "commentary",
+                  "balance"
+                ],
                 "properties": {
                   "date": {
                     "type": "string",
@@ -278,15 +287,25 @@
         }
       }
     },
-    "/api/transaction/:transactionID": {
+    "/api/transaction/{id}": {
       "delete": {
         "tags": ["Transaction"],
         "summary": "User delete transaction",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
@@ -294,6 +313,10 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
           },
           "401": {
             "description": "Not authorized",
@@ -337,32 +360,35 @@
             "type": "string",
             "description": "Registration successful"
           },
-          "data":{
-             "type": "object",
-            "properties":{
-              "token": {
-            "type": "string",
-            "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
-          },
-          "user": {
+          "data": {
             "type": "object",
             "properties": {
-              "email": {
+              "token": {
                 "type": "string",
-                "example": "Bismark@gmail.com"
+                "description": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8"
               },
-              "name": {
-                "type": "string",
-                "example": "Otto"
+              "user": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "Bismark@gmail.com"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Otto"
+                  }
+                }
               }
-            }
-          }
             }
           }
         },
         "example": {
-          "message": "Registration successful","data":{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8","user": { "email": "d.snata@gmail.com", "name": "Daniela"}
-           }
+          "message": "Registration successful",
+          "data": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGI5YTIwMDc0YjQyOTE4ZmFjZmUxYSIsImlhdCI6MTY0NDkyODA1MCwiZXhwIjoxNjQ0OTI5ODUwfQ.m2SwgVqZNJOYo6CVRn3JPu2oWlS4eN5oVlsDuKByLZ8",
+            "user": { "email": "d.snata@gmail.com", "name": "Daniela" }
+          }
         }
       },
       "LoginRequest": {
