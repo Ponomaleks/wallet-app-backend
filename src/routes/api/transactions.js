@@ -7,18 +7,31 @@ const countBalance = require("../../helpers/countBalance");
 const { Transaction, joiSchemaTransaction, User } = require("../../models");
 
 router.post("/add", authenticate, async (req, res, next) => {
-  console.log(authenticate);
   try {
-    const { error } =
-      joiSchemaTransaction.validate(req.body);
+    const { error } = joiSchemaTransaction.validate(req.body);
     if (error) {
       throw new BadRequest(error.message);
     }
+
     const { _id } = req.user;
-    console.log(req.user);
+    const { typeTransaction, amountTransaction } = req.body;
+
+    const userTransactions = await Transaction.find({ owner: _id });
+    const oldBalance = userTransactions[userTransactions.length - 1]
+      ? userTransactions[userTransactions.length - 1].balance
+      : 0;
+
+    const transactionBalance = countBalance(
+      typeTransaction,
+      oldBalance,
+      amountTransaction
+    );
+    await User.findByIdAndUpdate(_id, transactionBalance, { new: true });
+
     const newTransaction = await Transaction.create({
       ...req.body,
       owner: _id,
+      balance: transactionBalance,
     });
     res.status(201).json(newTransaction);
   } catch (error) {
@@ -30,7 +43,6 @@ router.post("/add", authenticate, async (req, res, next) => {
 });
 
 router.get("/", authenticate, async (req, res, next) => {
-  console.log(authenticate);
   try {
     const { page = 1, limit = 20 } = req.query;
     const { _id } = req.user;
@@ -47,36 +59,41 @@ router.get("/", authenticate, async (req, res, next) => {
   }
 });
 
-router.delete("/:transactionId", authenticate, async (req, res, next) => {
+router.delete("/:_id", authenticate, async (req, res, next) => {
   try {
-    const { error } = joiSchemaTransaction.validate(req.body);
-    if (error) {
-      throw new BadRequest(error.message);
-    }
-
-    const { transactionId, _id } = req.params;
-    const { balance } = req.user;
-    const { typeTransaction } = req.body;
-
-    const deleteTransaction = await Transaction.findByIdAndRemove({
-      _id: transactionId,
-      owner: _id,
-    });
-
-    if (!deleteTransaction) {
+    const transactionId = req.params._id;
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction) {
       throw new NotFound();
     }
 
-    const transactionBalance = countBalance(typeTransaction, balance, payload);
-    const updateBalance = await User.findByIdAndUpdate(
-      _id,
-      transactionBalance,
-      { new: true }
+    const { _id } = req.user;
+    const userTransactions = await Transaction.find({ owner: _id });
+
+    const deleteAmountTransaction = transaction.amountTransaction;
+    const deleteTypeTransaction = transaction.typeTransaction;
+    const deleteIndexEl = userTransactions.findIndex(
+      (transaction) => (transaction._id = transactionId)
     );
-    if (!updateBalance) {
-      throw new NotFound();
-    }
-    res.json({ message: "transaction deleted" });
+    console.log(deleteIndexEl);
+
+    await Transaction.findByIdAndDelete(transactionId);
+
+    // for (let i = deleteIndexEl; i < userTransactions.length; i++) {
+    //   userTransactions.map((transaction) => {
+    //     const id = transaction._id;
+    //     const oldBalance = transaction.balance;
+    //     const balance =
+    //       deleteTypeTransaction === "+"
+    //         ? (oldBalance * 100 - deleteAmountTransaction * 100) / 100
+    //         : (oldBalance * 100 + deleteAmountTransaction * 100) / 100;
+
+    //     transaction.balance = balance;
+    //     // console.log(transaction);
+    //     return transaction;
+    //   });
+    // }
+    res.json(userTransactions);
   } catch (error) {
     next(error);
   }
