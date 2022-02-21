@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
 // eslint-disable-next-line no-useless-escape
-const emailRegexp = /@"^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const emailRegexp = /.+@.+\..+/i;
 
 const userSchema = Schema(
   {
