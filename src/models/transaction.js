@@ -31,7 +31,7 @@ const transactionSchema = Schema({
       "Children",
       "House",
       "Education",
-      "Other"
+      "Other",
     ],
     require: true,
   },
@@ -41,6 +41,9 @@ const transactionSchema = Schema({
   amountTransaction: {
     type: Number,
     require: true,
+  },
+  balance: {
+    type: Number,
   },
   owner: {
     type: String,
@@ -53,18 +56,20 @@ const joiSchemaTransaction = Joi.object({
   year: Joi.number().required(),
   month: Joi.number().required(),
   typeTransaction: Joi.string().valid("+", "-").required(),
-  category: Joi.string().valid(
-    "Regular income",
-    "Irregular income",
-    "Basic",
-    "Food",
-    "Car",
-    "Development",
-    "Children",
-    "House",
-    "Education",
-    "Other"
-  ).required(),
+  category: Joi.string()
+    .valid(
+      "Regular income",
+      "Irregular income",
+      "Basic",
+      "Food",
+      "Car",
+      "Development",
+      "Children",
+      "House",
+      "Education",
+      "Other"
+    )
+    .required(),
   commentary: Joi.string(),
   amountTransaction: Joi.number().required(),
 });
