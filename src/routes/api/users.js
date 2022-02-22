@@ -6,6 +6,7 @@ const { BadRequest, Conflict, Unauthorized } = require("http-errors");
 const { User } = require("../../models");
 const { RegisterSchema, joiLoginSchema } = require("../../models/user");
 const { authenticate } = require("../../middlewares");
+const userService = require("../../service/user-service");
 
 const { SECRET_KEY } = process.env;
 
@@ -70,7 +71,8 @@ router.post("/login", async (req, res, next) => {
       throw Unauthorized("Email or password is wrong");
     }
 
-    const { _id, name } = user;
+    const { _id, name, balance } = user;
+    console.log(user);
     const payload = {
       id: _id,
     };
@@ -82,6 +84,7 @@ router.post("/login", async (req, res, next) => {
       user: {
         email,
         name,
+        balance,
       },
     });
   } catch (error) {
