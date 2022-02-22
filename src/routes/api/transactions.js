@@ -3,7 +3,10 @@ const router = express.Router();
 const { NotFound, BadRequest } = require("http-errors");
 const authenticate = require("../../middlewares/authenticate");
 
-const countBalance = require("../../helpers/countBalance");
+const {
+  countBalanceAdd,
+  countBalanceDelete,
+} = require("../../helpers/countBalance");
 const { Transaction, joiSchemaTransaction, User } = require("../../models");
 
 router.post("/add", authenticate, async (req, res, next) => {
@@ -14,6 +17,7 @@ router.post("/add", authenticate, async (req, res, next) => {
     }
 
     const { _id } = req.user;
+
     const { typeTransaction, amountTransaction } = req.body;
 
     const userTransactions = await Transaction.find({ owner: _id });
@@ -21,12 +25,17 @@ router.post("/add", authenticate, async (req, res, next) => {
       ? userTransactions[userTransactions.length - 1].balance
       : 0;
 
-    const transactionBalance = countBalance(
+    const transactionBalance = countBalanceAdd(
       typeTransaction,
       oldBalance,
       amountTransaction
     );
-    await User.findByIdAndUpdate(_id, transactionBalance, { new: true });
+
+    await User.findByIdAndUpdate(
+      _id,
+      { balance: transactionBalance ? transactionBalance : 0 },
+      { new: true }
+    );
 
     const newTransaction = await Transaction.create({
       ...req.body,
@@ -67,15 +76,17 @@ router.delete("/:_id", authenticate, async (req, res, next) => {
       throw new NotFound();
     }
 
-    const { _id } = req.user;
-    const userTransactions = await Transaction.find({ owner: _id });
+    const userId = req.user._id;
+
+    const userTransactions = await Transaction.find({ owner: userId });
 
     const deleteAmountTransaction = transaction.amountTransaction;
     const deleteTypeTransaction = transaction.typeTransaction;
-    const deleteIndexEl = userTransactions.findIndex(
-      (transaction) => (transaction._id = transactionId)
-    );
-    console.log(deleteIndexEl);
+    // const deleteIndexEl = userTransactions.findIndex(
+    //   (transaction) => (transaction._id = transactionId)
+    // );
+
+    // console.log(deleteIndexEl);
 
     await Transaction.findByIdAndDelete(transactionId);
 
@@ -93,7 +104,10 @@ router.delete("/:_id", authenticate, async (req, res, next) => {
     //     return transaction;
     //   });
     // }
-    res.json(userTransactions);
+
+    const newUserTransactions = await Transaction.find({ owner: userId });
+
+    res.json(newUserTransactions);
   } catch (error) {
     next(error);
   }

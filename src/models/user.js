@@ -24,6 +24,7 @@ const userSchema = Schema(
       type: String,
       default: null,
     },
+    balance: { type: Number, default: 0 },
     //если не будем использовать верификацию пользователя через email то удалим
     // verify: {
     //   type: Boolean,
