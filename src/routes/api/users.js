@@ -6,7 +6,6 @@ const { BadRequest, Conflict, Unauthorized } = require("http-errors");
 const { User } = require("../../models");
 const { RegisterSchema, joiLoginSchema } = require("../../models/user");
 const { authenticate } = require("../../middlewares");
-const userService = require("../../service/user-service");
 
 const { SECRET_KEY } = process.env;
 
