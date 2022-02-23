@@ -21,26 +21,28 @@ router.post("/add", authenticate, async (req, res, next) => {
     const { typeTransaction, amountTransaction } = req.body;
 
     const userTransactions = await Transaction.find({ owner: _id });
-    const oldBalance = userTransactions[userTransactions.length - 1]
+    const previousTransactionBalance = userTransactions[
+      userTransactions.length - 1
+    ]
       ? userTransactions[userTransactions.length - 1].balance
       : 0;
 
-    const transactionBalance = countBalanceAdd(
+    const newBalance = countBalanceAdd(
       typeTransaction,
-      oldBalance,
+      previousTransactionBalance,
       amountTransaction
     );
 
     await User.findByIdAndUpdate(
       _id,
-      { balance: transactionBalance ? transactionBalance : 0 },
+      { balance: newBalance ? newBalance : 0 },
       { new: true }
     );
 
     const newTransaction = await Transaction.create({
       ...req.body,
       owner: _id,
-      balance: transactionBalance,
+      balance: newBalance,
     });
     res.status(201).json(newTransaction);
   } catch (error) {
@@ -70,44 +72,70 @@ router.get("/", authenticate, async (req, res, next) => {
 
 router.delete("/:_id", authenticate, async (req, res, next) => {
   try {
-    const transactionId = req.params._id;
-    const transaction = await Transaction.findById(transactionId);
-    if (!transaction) {
+    const transactionDeleteId = req.params._id;
+    const transactionDelete = await Transaction.findById(transactionDeleteId);
+    if (!transactionDelete) {
       throw new NotFound();
     }
 
-    const userId = req.user._id;
+    const { _id } = req.user;
 
-    const userTransactions = await Transaction.find({ owner: userId });
+    const userTransactions = await Transaction.find({ owner: _id });
 
-    const deleteAmountTransaction = transaction.amountTransaction;
-    const deleteTypeTransaction = transaction.typeTransaction;
-    // const deleteIndexEl = userTransactions.findIndex(
-    //   (transaction) => (transaction._id = transactionId)
-    // );
+    const deleteAmountTransaction = transactionDelete.amountTransaction;
+    const deleteTypeTransaction = transactionDelete.typeTransaction;
+    const deleteIndexEl = userTransactions.findIndex(
+      (transaction) => transaction._id.toString() === transactionDeleteId
+    );
 
-    // console.log(deleteIndexEl);
+    await Transaction.findByIdAndDelete(transactionDeleteId);
 
-    await Transaction.findByIdAndDelete(transactionId);
+    const newUserTransactions = await Transaction.find({ owner: _id });
 
-    // for (let i = deleteIndexEl; i < userTransactions.length; i++) {
-    //   userTransactions.map((transaction) => {
-    //     const id = transaction._id;
-    //     const oldBalance = transaction.balance;
-    //     const balance =
-    //       deleteTypeTransaction === "+"
-    //         ? (oldBalance * 100 - deleteAmountTransaction * 100) / 100
-    //         : (oldBalance * 100 + deleteAmountTransaction * 100) / 100;
+    newUserTransactions.map((transaction, index) => {
+      const oldBalance = transaction.balance;
 
-    //     transaction.balance = balance;
-    //     // console.log(transaction);
-    //     return transaction;
-    //   });
-    // }
+      const newBalance = countBalanceDelete(
+        deleteTypeTransaction,
+        oldBalance,
+        deleteAmountTransaction
+      );
 
-    const newUserTransactions = await Transaction.find({ owner: userId });
+      const previousTransactionBalance =
+        newUserTransactions[newUserTransactions.length - 1].balance;
 
-    res.json(newUserTransactions);
+      if (index >= deleteIndexEl) {
+        transaction.balance = newBalance;
+
+        const userUpdate = User.findByIdAndUpdate(
+          { _id: _id },
+          { balance: newBalance ? newBalance : 0 },
+          { new: true }
+        );
+
+        const transactionsUpdate = Transaction.findByIdAndUpdate(
+          { _id },
+          { balance: newBalance ? newBalance : 0 },
+          { new: true }
+        );
+        return { userUpdate, transactionsUpdate };
+      }
+
+      if ((index = newUserTransactions.length - 1)) {
+        const userUpdate = User.findByIdAndUpdate(
+          { _id: _id },
+          {
+            balance: previousTransactionBalance,
+          },
+          { new: true }
+        );
+        return { userUpdate };
+      }
+
+      return transaction;
+    });
+
+    res.json({ message: "transaction deleted" });
   } catch (error) {
     next(error);
   }

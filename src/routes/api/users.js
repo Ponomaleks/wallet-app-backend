@@ -93,12 +93,13 @@ router.post("/login", async (req, res, next) => {
 
 // текущий пользователь
 router.get("/current", authenticate, async (req, res, next) => {
-  const { email, name, token } = req.user;
+  const { email, name, balance, token } = req.user;
   res.json({
     token,
     user: {
       email,
       name,
+      balance,
     },
   });
 });
