@@ -174,54 +174,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "date",
-                  "month",
-                  "year",
-                  "category",
-                  "amountTransaction",
-                  "typeTransaction",
-                  "commentary",
-                  "balance"
-                ],
-                "properties": {
-                  "date": {
-                    "type": "string",
-                    "example": "16338784",
-                    "description": "date"
-                  },
-                  "month": {
-                    "type": "number",
-                    "example": 12,
-                    "description": "month"
-                  },
-                  "year": {
-                    "type": "number",
-                    "example": 2020,
-                    "description": "year"
-                  },
-                  "category": {
-                    "type": "string",
-                    "example": "Regular income",
-                    "description": "category"
-                  },
-                  "commentary": {
-                    "type": "string",
-                    "example": "Sallary per month",
-                    "description": "commentary"
-                  },
-                  "amountTransaction": {
-                    "type": "number",
-                    "example": 1000,
-                    "description": "amountTransaction"
-                  },
-                  "typeTransaction": {
-                    "type": "string",
-                    "example": "+",
-                    "description": "typeTransaction"
-                  }
-                }
+                "$ref": "#/components/schemas/TransactionsAddRequest"
               }
             }
           }
@@ -232,57 +185,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "responses status",
-                      "example": "success"
-                    },
-                    "code": {
-                      "type": "string",
-                      "description": "responses code",
-                      "example": "200"
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "responses data",
-                      "example": {
-                        "newOperation": {
-                          "date": "16338784",
-                          "month": 12,
-                          "year": 2020,
-                          "typeTransaction": "+",
-                          "category": "Regular income",
-                          "commentary": "Sallary per month",
-                          "amountTransaction": 1000
-                        }
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/TransactionsAddResponse"
                 }
               }
             }
           },
           "403": {
             "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error 403"
-                }
-              }
-            }
+            "content": {}
           },
           "500": {
             "description": "Iternal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error 500"
-                }
-              }
-            }
+            "content": {}
           }
         }
       }
@@ -441,6 +355,84 @@
             "name": "Daniela",
             "balance": "1.00"
           }
+        }
+      },
+      "TransactionsAddResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "responses status"
+          },
+          "code": {
+            "type": "string",
+            "description": "responses code"
+          },
+          "data": {
+            "type": "object",
+            "description": "responses data"
+          }
+        },
+        "example": {
+          "date": "16338784",
+          "month": 12,
+          "year": 2020,
+          "typeTransaction": "+",
+          "category": "Regular income",
+          "commentary": "Sallary per month",
+          "amountTransaction": 1000
+        }
+      },
+      "TransactionsAddRequest": {
+        "type": "object",
+        "required": [
+          "date",
+          "month",
+          "year",
+          "category",
+          "amountTransaction",
+          "typeTransaction",
+          "commentary",
+          "balance"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "date"
+          },
+          "month": {
+            "type": "number",
+            "description": "month"
+          },
+          "year": {
+            "type": "number",
+            "description": "year"
+          },
+          "category": {
+            "type": "string",
+            "description": "category"
+          },
+          "commentary": {
+            "type": "string",
+            "description": "commentary"
+          },
+          "amountTransaction": {
+            "type": "number",
+            "description": "amountTransaction"
+          },
+          "typeTransaction": {
+            "type": "string",
+            "description": "typeTransaction"
+          }
+        },
+        "example": {
+          "date": "16338784",
+          "month": 12,
+          "year": 2020,
+          "category": "Regular income",
+          "commentary": "Sallary per month",
+          "amountTransaction": 1000,
+          "typeTransaction": "+"
         }
       },
       "TransactionsGetResponse": {
