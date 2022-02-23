@@ -1,5 +1,5 @@
-const { Schema, model } = require("mongoose");
-const Joi = require("joi");
+const { Schema, model } = require('mongoose');
+const Joi = require('joi');
 
 // eslint-disable-next-line no-useless-escape
 const emailRegexp = /.+@.+\..+/i;
@@ -8,17 +8,17 @@ const userSchema = Schema(
   {
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, 'Email is required'],
       match: emailRegexp,
       unique: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, 'Password is required'],
     },
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: [true, 'Name is required'],
     },
     token: {
       type: String,
@@ -50,7 +50,7 @@ const joiLoginSchema = Joi.object({
   password: Joi.string().min(6).max(12).required(),
 });
 
-const User = model("user", userSchema);
+const User = model('user', userSchema);
 
 module.exports = {
   User,
