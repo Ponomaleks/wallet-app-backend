@@ -28,7 +28,6 @@ router.get('/', authenticate, async (req, res, next) => {
       };
     } else query = { owner: _id };
 
-    console.log(query);
     const data = await Transaction.find(query);
 
     const income = getIncome(data);
