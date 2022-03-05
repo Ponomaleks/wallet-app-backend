@@ -44,6 +44,7 @@ router.post("/add", authenticate, async (req, res, next) => {
       owner: _id,
       balance: newBalance,
     });
+
     res.status(201).json(newTransaction);
   } catch (error) {
     if (error.message.includes("validation failed")) {
@@ -78,9 +79,9 @@ router.delete("/:_id", authenticate, async (req, res, next) => {
       throw new NotFound();
     }
 
-    const { _id } = req.user;
+    const userId = req.user._id;
 
-    const userTransactions = await Transaction.find({ owner: _id });
+    const userTransactions = await Transaction.find({ owner: userId });
 
     const deleteAmountTransaction = transactionDelete.amountTransaction;
     const deleteTypeTransaction = transactionDelete.typeTransaction;
@@ -90,50 +91,44 @@ router.delete("/:_id", authenticate, async (req, res, next) => {
 
     await Transaction.findByIdAndDelete(transactionDeleteId);
 
-    const newUserTransactions = await Transaction.find({ owner: _id });
-
-    newUserTransactions.map((transaction, index) => {
-      const oldBalance = transaction.balance;
-
-      const newBalance = countBalanceDelete(
-        deleteTypeTransaction,
-        oldBalance,
-        deleteAmountTransaction
-      );
-
-      const previousTransactionBalance =
-        newUserTransactions[newUserTransactions.length - 1].balance;
-
-      if (index >= deleteIndexEl) {
-        transaction.balance = newBalance;
-
-        const userUpdate = User.findByIdAndUpdate(
-          { _id: _id },
-          { balance: newBalance ? newBalance : 0 },
-          { new: true }
-        );
-
-        const transactionsUpdate = Transaction.findByIdAndUpdate(
-          { _id },
-          { balance: newBalance ? newBalance : 0 },
-          { new: true }
-        );
-        return { userUpdate, transactionsUpdate };
-      }
-
-      if ((index = newUserTransactions.length - 1)) {
-        const userUpdate = User.findByIdAndUpdate(
-          { _id: _id },
-          {
-            balance: previousTransactionBalance,
-          },
-          { new: true }
-        );
-        return { userUpdate };
-      }
-
-      return transaction;
+    const userTransactionsAfterDelete = await Transaction.find({
+      owner: userId,
     });
+
+    const updateTransactionId = userTransactionsAfterDelete
+      .map((transaction) => transaction._id.toString())
+      .filter((el, index) => index >= deleteIndexEl);
+
+    for (const id of updateTransactionId) {
+      await Transaction.updateOne(
+        { _id: id, owner: userId },
+        {
+          $set: {
+            balance: countBalanceDelete(
+              deleteTypeTransaction,
+              (
+                await Transaction.findById(id)
+              ).balance,
+              deleteAmountTransaction
+            ),
+          },
+        },
+        { new: true }
+      );
+    }
+
+    const newUserTransactions = await Transaction.find({ owner: userId });
+    const lastUserTransactionBalance = newUserTransactions[
+      newUserTransactions.length - 1
+    ]
+      ? newUserTransactions[newUserTransactions.length - 1].balance
+      : 0;
+
+    await User.findByIdAndUpdate(
+      userId,
+      { balance: lastUserTransactionBalance },
+      { new: true }
+    );
 
     res.json({ message: "transaction deleted" });
   } catch (error) {
