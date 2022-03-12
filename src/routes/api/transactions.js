@@ -7,6 +7,7 @@ const {
   countBalanceAdd,
   countBalanceDelete,
 } = require("../../helpers/countBalance");
+const { sortArray } = require("../../helpers/sortArray");
 const { Transaction, joiSchemaTransaction, User } = require("../../models");
 
 router.post("/add", authenticate, async (req, res, next) => {
@@ -45,6 +46,75 @@ router.post("/add", authenticate, async (req, res, next) => {
       balance: newBalance,
     });
 
+    const userTransactionsAfterAdd = await Transaction.find({
+      owner: _id,
+    });
+
+    const arr = [...userTransactionsAfterAdd];
+    const sortedUserTransactions = sortArray(arr);
+
+    const newTransactionIndex = sortedUserTransactions.findIndex(
+      (transaction) =>
+        transaction._id.toString() === newTransaction._id.toString()
+    );
+
+    const previousNewTransactionBalance =
+      newTransactionIndex === 0
+        ? 0
+        : sortedUserTransactions[newTransactionIndex - 1].balance;
+
+    await Transaction.updateOne(
+      { _id: newTransaction._id, owner: _id },
+      {
+        $set: {
+          balance: countBalanceAdd(
+            newTransaction.typeTransaction,
+            previousNewTransactionBalance,
+            newTransaction.amountTransaction
+          ),
+        },
+      },
+      { new: true }
+    );
+
+    const updateTransactionId = sortedUserTransactions
+      .map((transaction) => transaction._id.toString())
+      .filter((el, index) => index > newTransactionIndex);
+
+    for (const id of updateTransactionId) {
+      await Transaction.updateOne(
+        { _id: id, owner: _id },
+        {
+          $set: {
+            balance: countBalanceAdd(
+              newTransaction.typeTransaction,
+              (
+                await Transaction.findById(id)
+              ).balance,
+              newTransaction.amountTransaction
+            ),
+          },
+        },
+        { new: true }
+      );
+    }
+
+    const newUserTransactions = await Transaction.find({ owner: _id });
+    const arr1 = [...newUserTransactions];
+    const sortedNewUserTransactions = sortArray(arr1);
+
+    const lastUserTransactionBalance = sortedNewUserTransactions[
+      sortedNewUserTransactions.length - 1
+    ]
+      ? sortedNewUserTransactions[sortedNewUserTransactions.length - 1].balance
+      : 0;
+
+    await User.findByIdAndUpdate(
+      _id,
+      { balance: lastUserTransactionBalance },
+      { new: true }
+    );
+
     res.status(201).json(newTransaction);
   } catch (error) {
     if (error.message.includes("validation failed")) {
@@ -82,10 +152,12 @@ router.delete("/:_id", authenticate, async (req, res, next) => {
     const userId = req.user._id;
 
     const userTransactions = await Transaction.find({ owner: userId });
+    const arr = [...userTransactions];
+    const sortedUserTransactions = sortArray(arr);
 
     const deleteAmountTransaction = transactionDelete.amountTransaction;
     const deleteTypeTransaction = transactionDelete.typeTransaction;
-    const deleteIndexEl = userTransactions.findIndex(
+    const deleteIndexEl = sortedUserTransactions.findIndex(
       (transaction) => transaction._id.toString() === transactionDeleteId
     );
 
@@ -94,8 +166,10 @@ router.delete("/:_id", authenticate, async (req, res, next) => {
     const userTransactionsAfterDelete = await Transaction.find({
       owner: userId,
     });
+    const arr1 = [...userTransactionsAfterDelete];
+    const sortedUserTransactionsAfterDelete = sortArray(arr1);
 
-    const updateTransactionId = userTransactionsAfterDelete
+    const updateTransactionId = sortedUserTransactionsAfterDelete
       .map((transaction) => transaction._id.toString())
       .filter((el, index) => index >= deleteIndexEl);
 
@@ -118,10 +192,13 @@ router.delete("/:_id", authenticate, async (req, res, next) => {
     }
 
     const newUserTransactions = await Transaction.find({ owner: userId });
-    const lastUserTransactionBalance = newUserTransactions[
-      newUserTransactions.length - 1
+    const arr2 = [...newUserTransactions];
+    const sortedNewUserTransactions = sortArray(arr2);
+    
+    const lastUserTransactionBalance = sortedNewUserTransactions[
+      sortedNewUserTransactions.length - 1
     ]
-      ? newUserTransactions[newUserTransactions.length - 1].balance
+      ? sortedNewUserTransactions[sortedNewUserTransactions.length - 1].balance
       : 0;
 
     await User.findByIdAndUpdate(
