@@ -11,7 +11,7 @@
   },
   "servers": [
     { "url": "http://localhost:8080" },
-    { "url": "http://localhost:8080" }
+    { "url": "https://wallet-app-backend-gr10.herokuapp.com/" }
   ],
   "tags": [
     {
